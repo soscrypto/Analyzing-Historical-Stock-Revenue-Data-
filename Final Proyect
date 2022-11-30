@@ -1,16 +1,89 @@
   # Analyzing-Historical-Stock-Revenue-Data 
 
-#Question 1 - Extracting Tesla Stock Data Using yfinance
+!pip install yfinance
+#!pip install pandas
+#!pip install requests
+!pip install bs4
+#!pip install plotly
+!pip install html5lib
+#!pip install html5lib
 
-!pip install yfinance==0.1.67
-#!pip install pandas==1.3.3
 
 import yfinance as yf
 import pandas as pd
+import requests
+from bs4 import BeautifulSoup
 
 
-Question 2 - Extracting Tesla Revenue Data Using Webscraping - 1 Points
+#Question 1 - Extracting Tesla Stock Data Using yfinance
 
-Tesla = yf.Ticker("TSL")
+Tesla = yf.Ticker("TSLA")
 Tesla_info=Tesla.info
 Tesla_info
+
+#Question 2 - Extracting Tesla Revenue Data Using Webscraping - 1 Points
+
+url = " https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
+html_data = requests.get(url).text
+
+soup = BeautifulSoup(html_data,"html5lib")
+
+url = " https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
+html_data = requests.get(url).text
+
+soup = BeautifulSoup(html_data,"html5lib")
+
+# import warnings filter
+from warnings import simplefilter
+# ignore all future warnings
+simplefilter(action='ignore', category=FutureWarning)
+tables = soup.find_all('table')
+for index,table in enumerate(tables):
+    if ("Tesla Quarterly Revenue" in str(table)):
+        table_index = index
+Tesla_revenue = pd.DataFrame(columns=["Date", "Revenue"])
+for row in tables[table_index].tbody.find_all("tr"):
+    col = row.find_all("td")
+    if (col != []):
+        Date = col[0].text
+        Revenue = col[1].text.replace("$", "").replace(",", "")
+        Tesla_revenue = Tesla_revenue .append({"Date":Date, "Revenue":Revenue}, ignore_index=True)
+Tesla_revenue = Tesla_revenue[Tesla_revenue['Revenue'] != ""]
+Tesla_revenue
+
+#Question 3 - Extracting GameStop Stock Data Using yfinance - 2 Points
+
+GameStop = yf.Ticker("GME")
+GameStop_info=GameStop.info
+GameStop_info
+
+#Question 4 - Extracting GameStop Revenue Data Using Webscraping
+
+url="https://www.macrotrends.net/stocks/charts/GME/gamestop/revenue"
+html_data= requests.get(url).text
+
+soup = BeautifulSoup(html_data,"html5lib")
+
+tables = soup.find_all('table')
+for index,table in enumerate(tables):
+    if ("GameStop Quarterly Revenue" in str(table)):
+        table_index = index
+gme_revenue = pd.DataFrame(columns=["Date", "Revenue"])
+for row in tables[table_index].tbody.find_all("tr"):
+    col = row.find_all("td")
+    if (col != []):
+        Date = col[0].text
+        
+        Revenue = col[1].text.replace("$", "").replace(",", "")
+        gme_revenue = gme_revenue.append({"Date":Date, "Revenue":Revenue}, ignore_index=True)
+        
+Tesla_revenue = Tesla_revenue[Tesla_revenue['Revenue'] != ""]
+Tesla_revenue
+        
+#Question 5 - Tesla Stock and Revenue Dashboard
+
+Tesla_revenue.tail()
+
+#Question 6 - GameStop Stock and Revenue Dashboard
+
+gme_revenue.tail()
