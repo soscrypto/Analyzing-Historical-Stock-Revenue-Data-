@@ -21,7 +21,7 @@ Tesla = yf.Ticker("TSLA")
 Tesla_info=Tesla.info
 Tesla_info
 
-#Question 2 - Extracting Tesla Revenue Data Using Webscraping - 1 Points
+#Question 2 - Extracting Tesla Revenue Data Using Webscraping 
 
 url = " https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
 html_data = requests.get(url).text
@@ -51,7 +51,7 @@ for row in tables[table_index].tbody.find_all("tr"):
 Tesla_revenue = Tesla_revenue[Tesla_revenue['Revenue'] != ""]
 Tesla_revenue
 
-#Question 3 - Extracting GameStop Stock Data Using yfinance - 2 Points
+#Question 3 - Extracting GameStop Stock Data Using yfinance 
 
 GameStop = yf.Ticker("GME")
 GameStop_info=GameStop.info
