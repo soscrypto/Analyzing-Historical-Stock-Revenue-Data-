@@ -13,6 +13,22 @@ import yfinance as yf
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+
+def make_graph(stock_data, revenue_data, stock):
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, subplot_titles=("Historical Share Price", "Historical Revenue"), vertical_spacing = .3)
+    fig.add_trace(go.Scatter(x=pd.to_datetime(stock_data.Date, infer_datetime_format=True), y=stock_data.Close.astype("float"), name="Share Price"), row=1, col=1)
+    fig.add_trace(go.Scatter(x=pd.to_datetime(revenue_data.Date, infer_datetime_format=True), y=revenue_data.Revenue.astype("float"), name="Revenue"), row=2, col=1)
+    fig.update_xaxes(title_text="Date", row=1, col=1)
+    fig.update_xaxes(title_text="Date", row=2, col=1)
+    fig.update_yaxes(title_text="Price ($US)", row=1, col=1)
+    fig.update_yaxes(title_text="Revenue ($US Millions)", row=2, col=1)
+    fig.update_layout(showlegend=False,
+    height=900,
+    title=stock,
+    xaxis_rangeslider_visible=True)
+    fig.show()
 
 
 #Question 1 - Extracting Tesla Stock Data Using yfinance
@@ -21,12 +37,11 @@ Tesla = yf.Ticker("TSLA")
 Tesla_info=Tesla.info
 Tesla_info
 
+
+Tesla_data = Tesla.history(period="max")
+Tesla_data.head()
+
 #Question 2 - Extracting Tesla Revenue Data Using Webscraping 
-
-url = " https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
-html_data = requests.get(url).text
-
-soup = BeautifulSoup(html_data,"html5lib")
 
 url = " https://www.macrotrends.net/stocks/charts/TSLA/tesla/revenue"
 html_data = requests.get(url).text
@@ -57,6 +72,10 @@ GameStop = yf.Ticker("GME")
 GameStop_info=GameStop.info
 GameStop_info
 
+
+GameStop_data = GameStop.history(period="max")
+GameStop_data.head()
+
 #Question 4 - Extracting GameStop Revenue Data Using Webscraping
 
 url="https://www.macrotrends.net/stocks/charts/GME/gamestop/revenue"
@@ -64,26 +83,34 @@ html_data= requests.get(url).text
 
 soup = BeautifulSoup(html_data,"html5lib")
 
+# import warnings filter
+from warnings import simplefilter
+# ignore all future warnings
+simplefilter(action='ignore', category=FutureWarning)
 tables = soup.find_all('table')
 for index,table in enumerate(tables):
     if ("GameStop Quarterly Revenue" in str(table)):
         table_index = index
-gme_revenue = pd.DataFrame(columns=["Date", "Revenue"])
+GameStop_revenue = pd.DataFrame(columns=["Date", "Revenue"])
 for row in tables[table_index].tbody.find_all("tr"):
     col = row.find_all("td")
     if (col != []):
         Date = col[0].text
         
         Revenue = col[1].text.replace("$", "").replace(",", "")
-        gme_revenue = gme_revenue.append({"Date":Date, "Revenue":Revenue}, ignore_index=True)
+        GameStop_revenue = GameStop_revenue.append({"Date":Date, "Revenue":Revenue}, ignore_index=True)
         
-Tesla_revenue = Tesla_revenue[Tesla_revenue['Revenue'] != ""]
-Tesla_revenue
+GameStop_revenue = GameStop_revenue[GameStop_revenue['Revenue'] != ""]
+GameStop_revenue
         
 #Question 5 - Tesla Stock and Revenue Dashboard
 
-Tesla_revenue.tail()
+Tesla_data.reset_index(inplace=True)
+Tesla_data.plot(x="Date", y="Open")
+make_graph(Tesla_data, Tesla_revenue, 'Tesla Stock Data Graph')
 
 #Question 6 - GameStop Stock and Revenue Dashboard
 
-gme_revenue.tail()
+GameStop_data.reset_index(inplace=True)
+GameStop_data.plot(x="Date", y="Open")
+make_graph(GameStop_data,GameStop_revenue,'GameStop')
