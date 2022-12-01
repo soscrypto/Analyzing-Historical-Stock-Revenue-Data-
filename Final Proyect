@@ -66,6 +66,8 @@ for row in tables[table_index].tbody.find_all("tr"):
 Tesla_revenue = Tesla_revenue[Tesla_revenue['Revenue'] != ""]
 Tesla_revenue
 
+Tesla_revenue.tail()
+
 #Question 3 - Extracting GameStop Stock Data Using yfinance 
 
 GameStop = yf.Ticker("GME")
@@ -102,7 +104,10 @@ for row in tables[table_index].tbody.find_all("tr"):
         
 GameStop_revenue = GameStop_revenue[GameStop_revenue['Revenue'] != ""]
 GameStop_revenue
-        
+  
+GameStop_revenue.tail()
+
+
 #Question 5 - Tesla Stock and Revenue Dashboard
 
 Tesla_data.reset_index(inplace=True)
